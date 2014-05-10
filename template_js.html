@@ -1,0 +1,2222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html ng-app="tutorial">
+<head>
+    <title>Stickk-Microsoft Educational Research Program</title>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="css/watcher.css">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,700' rel='stylesheet' type='text/css'>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+    <script type="text/javascript">
+        var fps = 30;
+        var quality = 100;
+        var timeout = 33;
+        var baseURL = ""; //change this to "http://_yawcam_computer_address:port/" when running on own server.
+        var t_;
+        var i_;
+        var ct_;
+        var id;
+        var xmlHttp;
+        var firstReq = true;
+        var state = "null";
+
+        function updateID() {
+            id = Math.random();
+        }
+
+        function setFps(val) {
+            fps = val;
+            timeout = Math.round(1000.0 / fps);
+        }
+
+        function setQ(val) {
+            quality = 100;
+        }
+
+        function scaleIn() {
+            document.images.camImg.width = document.images.camImg.width + 40;
+            document.images.camImg.height = document.images.camImg.height + 30;
+        }
+
+        function scaleOut() {
+            document.images.camImg.width = document.images.camImg.width - 40;
+            document.images.camImg.height = document.images.camImg.height - 30;
+        }
+
+        function scaleOrg() {
+            document.images.camImg.width = @WIDTH;
+            document.images.camImg.height = @HEIGHT;
+        }
+
+        function showLayer(theLayer) {
+            getLayer(theLayer).style.display = "block";
+        }
+
+        function hideLayer(theLayer) {
+            getLayer(theLayer).style.display = "none";
+        }
+
+        function hideAllMenuLayers() {
+            hideLayer('menu_fps');
+            hideLayer('menu_fps_child');
+            hideLayer('menu_quality');
+            hideLayer('menu_quality_child');
+            hideLayer('menu_scale');
+            hideLayer('menu_scale_child');
+                    @SOUND_OPTION
+            hideLayer('menu_sound');
+            hideLayer('menu_sound_child');
+                    @SOUND_OPTION
+            hideLayer('menu_about');
+            hideLayer('menu_about_child');
+        }
+
+        function hideAllMenuChildren() {
+            hideLayer('menu_fps_child');
+            hideLayer('menu_quality_child');
+            hideLayer('menu_scale_child');
+                    @SOUND_OPTION
+            hideLayer('menu_sound_child');
+                    @SOUND_OPTION
+            hideLayer('menu_about_child');
+        }
+
+        function showAllMenuCols() {
+            showLayer('menu_fps');
+            showLayer('menu_quality');
+            showLayer('menu_scale');
+                    @SOUND_OPTION
+            showLayer('menu_sound');
+                    @SOUND_OPTION
+            showLayer('menu_about');
+        }
+
+        function fixMenuColPos(owner) {
+            var i = 0;
+            setLyr(owner, 'menu_fps', false, i++);
+            setLyr(owner, 'menu_quality', false, i++);
+            setLyr(owner, 'menu_scale', false, i++);
+                    @SOUND_OPTION
+            setLyr(owner, 'menu_sound', false, i++);
+                    @SOUND_OPTION
+            setLyr(owner, 'menu_about', false, i++);
+        }
+
+        function getLayer(theLayer) {
+            var obj = null;
+            if (document.getElementById) {
+                obj = document.getElementById(theLayer);
+            }
+            else if (document.all) {
+                obj = document.all[theLayer];
+            }
+            else if (document.layers) {
+                obj = document.layers[theLayer];
+            }
+            return obj;
+        }
+
+        function getMarker(val, testVal) {
+            var str = null;
+            if (val == testVal) {
+                str = "<img src=\"img/mrk.gif\" style=\"border:none;vertical-align: text-bottom;margin: 0px;\" alt=\"<--\">";
+            }
+            else {
+                str = "";
+            }
+            return str;
+        }
+
+        function showErrorImage() {
+            clearTimeout(t_);
+            clearInterval(i_);
+            document.images.camImg.onload = "";
+            document.images.camImg.src = "http://www.yawcam.com/offline.jpg";
+            window.status = "Webcam offline";
+        }
+
+        function showStatusImage(imgUrl) {
+            clearTimeout(t_);
+            clearInterval(i_);
+            document.images.camImg.onload = "";
+            document.images.camImg.src = imgUrl;
+        }
+
+        function reloadImage() {
+            var theDate = new Date();
+            var url = baseURL + "out.jpg?";
+            url += ("q=" + quality);
+            url += ("&id=" + id);
+            url += "&r=";
+            url += theDate.getTime().toString();
+            document.images.camImg.src = url;
+            window.status = "Yawcam streaming...";
+        }
+
+        function fixImageTimeout() {
+            t_ = setTimeout("reloadImage();", timeout);
+        }
+
+        function cTO() {
+            if (state == "running") {
+                clearTimeout(t_);
+                reloadImage();
+            }
+        }
+
+        function updateFpsMenu() {
+            document.getElementById('fps_30').innerHTML = "30 " + getMarker(fps, 30);
+            document.getElementById('fps_15').innerHTML = "15 " + getMarker(fps, 15);
+            document.getElementById('fps_10').innerHTML = "10 " + getMarker(fps, 10);
+            document.getElementById('fps_5').innerHTML = "5 " + getMarker(fps, 5);
+            document.getElementById('fps_1').innerHTML = "1 " + getMarker(fps, 1);
+        }
+
+        function updateQualityMenu() {
+            document.getElementById('q_75').innerHTML = "75 % " + getMarker(quality, 75);
+            document.getElementById('q_50').innerHTML = "50 % " + getMarker(quality, 50);
+            document.getElementById('q_40').innerHTML = "40 % " + getMarker(quality, 40);
+            document.getElementById('q_30').innerHTML = "30 % " + getMarker(quality, 30);
+            document.getElementById('q_20').innerHTML = "20 % " + getMarker(quality, 20);
+            document.getElementById('q_10').innerHTML = "10 % " + getMarker(quality, 10);
+            document.getElementById('q_5').innerHTML = "5 % " + getMarker(quality, 5);
+            document.getElementById('q_1').innerHTML = "1 % " + getMarker(quality, 1);
+        }
+
+        function setLyr(obj, lyr, drop, col) {
+            var coors = findPos(obj);
+            var x = document.getElementById(lyr);
+            if (drop == true) {
+                coors[1] = coors[1] + 26;
+            }
+            x.style.top = coors[1] + 'px';
+            coors[0] = coors[0] + (col * 80);
+            x.style.left = coors[0] + 'px';
+        }
+
+        function findPos(obj) {
+            var curleft = curtop = 0;
+            if (obj.offsetParent) {
+                curleft = obj.offsetLeft
+                curtop = obj.offsetTop
+                while (obj = obj.offsetParent) {
+                    curleft += obj.offsetLeft
+                    curtop += obj.offsetTop
+                }
+            }
+            return [curleft, curtop];
+        }
+
+        function startPoll() {
+            document.images.camImg.onload = fixImageTimeout
+            fixConnectTimeout();
+            getStatus();
+        }
+
+        function fixStatusTimeout() {
+            ts_ = setTimeout("getStatus();", 2000);
+        }
+
+        function fixConnectTimeout() {
+            ct_ = setTimeout("showErrorImage();", 45000);
+        }
+
+        function getStatus() {
+            xmlHttp = GetXmlHttpObject()
+            if (xmlHttp == null) {
+                alert("Browser does not support HTTP Request")
+                return
+            }
+            var url = baseURL + "get?id=" + id + "&r=" + Math.random()
+            xmlHttp.onreadystatechange = stateChanged
+            xmlHttp.open("GET", url, true)
+            xmlHttp.send(null)
+        }
+
+        function sendPass() {
+            xmlHttp = GetXmlHttpObject()
+            if (xmlHttp == null) {
+                alert("Browser does not support HTTP Request")
+                return
+            }
+            var user = document.getElementById('user').value;
+            var pass = document.getElementById('pass').value;
+            var url = baseURL + "get?id=" + id + "&u=" + user + "&p=" + pass + "&r=" + Math.random()
+            xmlHttp.onreadystatechange = stateChanged
+            xmlHttp.open("GET", url, true)
+            xmlHttp.send(null)
+        }
+
+        function playSound(file) {
+
+            var selection = document.adevform.adev;
+            var target = 0;
+            if (selection) {
+                for (var i = 0; i < selection.length; ++i) {
+                    if (selection[i].checked == true)
+                        target = i;
+                }
+            }
+
+            xmlHttp = GetXmlHttpObject()
+            if (xmlHttp == null) {
+                alert("Browser does not support HTTP Request")
+                return
+            }
+            var url = baseURL + "playsound?file=" + file + "&target=" + target + "&r=" + Math.random()
+            xmlHttp.onreadystatechange = stateChanged
+            xmlHttp.open("GET", url, true)
+            xmlHttp.send(null)
+        }
+
+        function stateChanged() {
+            if (xmlHttp.readyState == 4 || xmlHttp.readyState == "complete") {
+                if (xmlHttp.status == 200) {
+                    if (xmlHttp.responseText == "ok") {
+                        if (firstReq) {
+                            i_ = setInterval("getStatus();", 2000);
+                            clearTimeout(ct_);
+                            hideLayer('passLyr');
+                            firstReq = false;
+                            state = "running";
+                            document.images.camImg.onload = fixImageTimeout
+                            reloadImage();
+                        }
+                    }
+                    else if (xmlHttp.responseText == "2many") {
+                        clearTimeout(ct_);
+                        state = "2many";
+                        showStatusImage("img/toomany.jpg");
+                        window.status = "Try later...";
+                    }
+                    else if (xmlHttp.responseText == "banned") {
+                        clearTimeout(ct_);
+                        state = "banned";
+                        showStatusImage("img/banned.jpg");
+                        window.status = "You are banned.";
+                    }
+                    else if (xmlHttp.responseText == "dataLimit") {
+                        state = "datalimit";
+                        showStatusImage("img/datalimit.jpg");
+                        window.status = "You hit data limit.";
+                    }
+                    else if (xmlHttp.responseText == "timeLimit") {
+                        state = "timelimit";
+                        showStatusImage("img/timelimit.jpg");
+                        window.status = "You hit time limit.";
+                    }
+                    else if (xmlHttp.responseText == "kicked") {
+                        state = "kicked";
+                        showStatusImage("img/kicked.jpg");
+                        window.status = "You are kicked.";
+                    }
+                    else if (xmlHttp.responseText == "passErr") {
+                        state = "passErr";
+                        document.getElementById('passHeading').innerHTML = '<font color="#FF0000">Login Error!</font>';
+                        window.status = "Login Error!";
+                    }
+                    else if (xmlHttp.responseText == "pass") {
+                        clearTimeout(ct_);
+                        state = "pass";
+                        showStatusImage("img/pass.jpg");
+                        setLyr(document.getElementById('camImg'), 'passLyr', false, 0);
+                        showLayer('passLyr');
+                    }
+                    else if (xmlHttp.responseText == "playing sound") {
+                        /* Do nothing */
+                    }
+                    else if (xmlHttp.responseText == "playing sound failed") {
+                        alert("Failed to play sound!");
+                    }
+                    else {
+                        state = "error";
+                        showErrorImage();
+                        window.status = "Error...";
+                        alert("Unknown response: " + xmlHttp.responseText);
+                    }
+                }
+                else if (xmlHttp.status == 404) {
+                    //alert("Got 404");
+                }
+            }
+        }
+
+        function GetXmlHttpObject() {
+            var XMLHttp_ = null
+            try {
+                XMLHttp_ = new ActiveXObject("Msxml2.XMLHTTP")
+            }
+            catch (e) {
+                try {
+                    XMLHttp_ = new ActiveXObject("Microsoft.XMLHTTP")
+                } catch (e) {
+                }
+            }
+
+            if (XMLHttp_ == null) {
+                XMLHttp_ = new XMLHttpRequest()
+            }
+
+            return XMLHttp_;
+        }
+    </script>
+</head>
+
+    <body> <div ng-include =" 'kasper.html' "></div>
+    <div class="navbar navbar-inverse" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse" type="button">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand navStickk" target="_blank" href="http://www.stickk.com">
+                    stickK
+                </a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a class="font-contract" href="#">
+                            <i class="fa fa-pencil-square-o"></i>
+                            CONTRACT #18134
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="navbar navbar-mc">
+        <div class="container-fluid">
+            <div class="mc">
+                <h2 class="h2-mc">
+                    Microsoft Educational Research Program
+                </h2>
+            </div>
+        </div>
+    </div>
+        <div ng-include ="kasper.html">Test</div>
+    <div class="container-fluid">
+        <div class="jumboHead">
+            <div class="row">
+                <div class="col-md-3">
+
+                    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.7/angular.min.js"></script>
+                    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.7/angular-animate.js"></script>
+                    <script>
+
+                        var tutorial = angular.module('tutorial', ['ngAnimate']);
+                        tutorial.controller('indexCtrl', function($scope, $timeout)
+                        {
+                            $scope.records = [];
+                            $timeout(function()
+                            {
+                                $scope.records = [
+                                    { text: 'GruntJS in your daily WebDev workflow', url: 'http://www.screencast.com/users/SvitlanaShepitsena/folders/WebStorm/media/246eb523-e89f-45c6-a141-a17d46813d70' },
+                                    { text: 'WebStrorm IDE. Live Templates', url: 'http://www.screencast.com/users/SvitlanaShepitsena/folders/WebStorm/media/6c9f1961-7ccb-4be6-8306-85dcd1b4acae' },
+                                    { text: 'WebStrorm IDE. KeyPromoter, Remapping Shortcuts', url: 'http://www.screencast.com/users/SvitlanaShepitsena/folders/WebStorm/media/60681202-4957-4c4e-b6d2-0b3274717eb3#' },
+                                    { text: 'GruntJS. Creating Custom Tasks', url: 'http://www.screencast.com/users/SvitlanaShepitsena/folders/WebStorm/media/d94688f5-b179-4003-96ba-68622c998882' },
+                                    { text: 'WebStrorm IDE. AceJump Plugin', url: 'http://www.screencast.com/users/SvitlanaShepitsena/folders/WebStorm/media/a5197139-8fe8-4a66-b155-314a8fc44790' },
+                                    { text: 'WebStrorm IDE. Creating a Project with Yeoman', url: 'http://www.screencast.com/users/SvitlanaShepitsena/folders/WebStorm/media/22353944-bbf2-4a7f-a02d-5dc741af76ab' },
+                                    { text: 'WebStrorm IDE. Working Enviroment, Keymapping, Creating Gists', url: 'http://www.screencast.com/users/SvitlanaShepitsena/folders/Camtasia%20Studio/media/ec295b0b-07ec-4891-8834-97c44d74cfbf' },
+                                    { text: 'WebStrorm JavaScript Application Setup', url: 'http://www.screencast.com/users/SvitlanaShepitsena/folders/Camtasia%20Studio/media/805d1e32-428f-4ed4-bbbe-e5601c602d25' },
+                                ];
+                            });
+                        });
+                    </script>
+
+
+                    <h4 class="panel-title title-tut">
+                        <i class="fa fa-book"></i>
+                        WebStorm <span class="tutDay">TUTORIALS OF THE DAY</span>
+                    </h4>
+                    <h4 class="tutDate">
+                        <i class="fa fa-calendar-o"></i>
+                        5/09/2014
+                    </h4>
+
+
+                    <div ng-controller="indexCtrl">
+                        <ul class="list-unstyled">
+                            <li ng-repeat="r in records" class="my-repeat-animation">
+                                <p class="pTut">
+
+                                    <a class="aTut" target="_blank"
+                                       href="{{r.url}}">
+                                        <i class="fa fa-check-square"></i>
+                                        {{r.text}}
+                                    </a>
+                                </p>
+                            </li>
+                        </ul>
+
+
+                        <button class="btn btn-primary btn-custom" data-toggle="modal" data-target="#myModal">
+                            More Essential Tutorials&raquo;
+                        </button>
+                        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close moreModal" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                        <h4 class="modal-title scrumHeaderFont" id="myModalLabel">
+                                            ASP.NET MVC 5 Tutorials. <span class="text-muted text-muted-scrum">Essentials (101)</span>
+                                        </h4>
+                                    </div>
+                                    <div class="modal-body">
+
+                                        <ol class="ol-tuts">
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/5b280cc1-0c50-444b-826c-2ef81ff4d3f0">
+                                                    Creating
+                                                    a ASP.Net MVC5 Web Application.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/8b05b434-988c-499d-8224-f69bf509ec02">
+                                                    Creating
+                                                    a new application page with Model, View and Controller.
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/385d86c2-6124-4cb0-9a18-2d3c0961e975">
+                                                    Working
+                                                    with SQL server Local Db
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/9212e56e-1283-416c-8fc0-67e45b3aad73">
+                                                    Implementing
+                                                    basic CRUD functionality using local db. Part 1.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/1b24584b-b0ce-4370-96c8-0d9ea95700c0">
+                                                    Updating
+                                                    controller and views after changing a model. CRUD functionality. Part 2.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/4a224933-419b-4a67-abd5-38ff03db26cb">
+                                                    Creating
+                                                    a page with a data table. Displaying real date.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/f91dc80b-d408-4074-8507-306ebd6dfbce">
+                                                    Entity
+                                                    Framework Model Mapping. First Code Approach..
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/c95abcc1-5b8f-4444-b52c-273e71f3b222">
+                                                    Creating
+                                                    a responsive designt of a page using Bootstrap grid system.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/72b56496-2bf0-42ea-ba2b-5a97b2badc6f">
+                                                    Using
+                                                    and creating Razor Templates.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/6b50277e-9a5b-41a2-9bc1-442fdbce775d">
+                                                    Creating
+                                                    a partial view.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/979be712-e8a1-4d3f-b9cf-e3494d3c0a2e">
+                                                    Creating
+                                                    an additional navbar with navbar-search form.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/bed48216-6dec-4a0a-9572-6eb95d1a733f">
+                                                    Bootstrap
+                                                    design for register page. Working with grid system and form elements.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/d46fb2ab-5e10-4fc4-9909-82b7b42bc7c8">
+                                                    Web
+                                                    Essentials for Visual Studio. General Features.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/e2ff6840-355c-40de-80cf-ee130e2fc067">
+                                                    Web
+                                                    Essentials for Visual Studio. Working with images.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/74d92359-7d77-409c-836c-8a393e69b659">
+                                                    Web
+                                                    Essentials for Visual Studio. Working with less compiler.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/193c1448-d5f1-4491-b82b-b34e90461008">
+                                                    ASP.Net
+                                                    MVC5 Web Application. Routing.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/663dfb48-c19c-4d93-a449-1b46e7978957">
+                                                    ASP.Net
+                                                    MVC5 Web Application. HTML Helpers.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20(101)/media/49369380-42a7-407a-9439-31dd33f03668">
+                                                    Model
+                                                    Data Annotation. Part 1.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/ddb1ca2e-d1c0-4e07-8f39-374ca7c53b1d">
+                                                    Zen
+                                                    Coding in Visual Studio 2013 with Web Essentials.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/89956091-d5af-4c56-a039-738c9d75e089">
+                                                    Creating
+                                                    a Mailbox. Part 1.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20(101)/media/6d3dcee1-880d-4e69-b12e-f8331b5cec54">
+                                                    Creating
+                                                    a Mailbox. Part 2. IRepository Interface
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/48e74d2f-a8b6-4950-8770-a3182624eabb">
+                                                    Creating
+                                                    a Mailbox. 2 Level Abstraction
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/e4b9ef73-1da1-4a07-ba5f-75efdd84d81b">
+                                                    CSS
+                                                    Styles with JavaScript.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20(101)/media/d9fa3dfa-90b2-4b34-9d6b-bf95aff70379">
+                                                    ASP.Net
+                                                    MVC Optimization. Views.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/57cacba8-b561-4afd-82b6-523534d346cf">
+                                                    ASP.Net
+                                                    MVC Optimization. Controllers.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/84b42658-fda9-4016-8d20-bf5643e5a50d">
+                                                    TDD
+                                                    using Mocking Database.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20(101)/media/e528ef10-3222-4501-80d0-a75bf5dfb369">
+                                                    Static
+                                                    Extention Methods
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/7f2719a7-4965-443d-a31e-959edb48d9d2">
+                                                    CRUD.
+                                                    Sending a message functionality.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20(101)/media/841d7162-12c9-4d60-9526-dacf2921f021">
+                                                    CRUD.
+                                                    Delete a message functionality.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/d047ab95-cbf0-442f-b326-2cc1b9bdb145">
+                                                    Less
+                                                    files structure. Importing.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/e828a90e-c427-4d64-a5b1-157980116a6d">
+                                                    Custom
+                                                    HTML Helpers with Extension Methods
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/aefc5b2d-fa58-4c28-ab83-1462bd98db5d">
+                                                    Less.
+                                                    StyleBundle
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/310136ca-ec5d-4348-83e4-c158379331ab">
+                                                    Less.
+                                                    Varialbles and Mixins
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/2d072146-2078-4f97-8008-a3b2c3e0468c">
+                                                    Creating
+                                                    a ASP.Net SignalR Web Application
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/490110ad-3935-48fa-946f-27555694f50d">
+                                                    ASP.Net
+                                                    SignalR. Creating a Chat with Windows Authentication
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/d37ffdef-35b3-4793-bda2-d4c3040b6fa6">
+                                                    Message
+                                                    Notification with SignalR. Part 1
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/1ebd7fde-db46-498b-8d5c-8572d2a4b4ed">
+                                                    Message
+                                                    Notification with SignalR. Part 2
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/a9f63389-6b3c-4880-b288-ae16f1d72c89">
+                                                    Message
+                                                    Notification with SignalR. Part 3
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/efafc610-ae97-42aa-83ea-82c856ab3d45">
+                                                    Message
+                                                    Notification with SignalR. Part 4
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/eb03f4cb-32c3-498c-a35b-edd99d7c1988">
+                                                    Message
+                                                    Notification with SignalR. Part 5
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/19991f9f-1972-45c2-8230-0904432cfc7c">
+                                                    Message
+                                                    Notification with SignalR. Part 6
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/75a2bb40-8636-4d46-baf0-ba8856703980">
+                                                    AngularJs
+                                                    MVC Framework. Part 1
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/3234ab90-1040-486c-b47d-cfc7217f4f40">
+                                                    AngularJs
+                                                    MVC Framework. Part 2
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/50cce962-7b9f-4acc-ae45-d309019cb940">
+                                                    AngularJs MVC Framework. Testing Creating a Message Functionality. Part 1.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/fb34489b-106a-45e9-8d2c-d367f42c6f7a">
+                                                    AngularJs MVC Framework. Testing Creating a Message Functionality. Part 2.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/bfd23be8-a50c-4143-a4aa-a5a7bf63f976">
+                                                    AngularJs. Cteating Custom Directives
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/9fefaf91-9610-4b6c-aec0-17298260b7d2">
+                                                    Reply Functionality with BDD
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/38e24ecf-0587-4490-be9c-64bb09b60f2f">
+                                                    AngularJs. Creating Custom Filters
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/2425e889-4c56-4088-b3a0-b6743d66d5d7">
+                                                    Animation with AngularJs.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="webEssentials" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/a142770e-3fa8-4e6e-865e-3708ebfeb91b">
+                                                    AngularJs. Cteating Custom Directives with Controller and Link Functionality
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="webEssentials" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/a142770e-3fa8-4e6e-865e-3708ebfeb91b">
+                                                    Creating a User Management App with AngularJs. Part 1.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="webEssentials" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/User%20Management%20AngularJs%20Application/media/eea27f57-e66d-48bf-9726-5d5cc30c2e79">
+                                                    Creating a User Management App with AngularJs. Part 2.
+                                                    <br />
+                                                    Definetely Typed Services in TypeScript.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="webEssentials" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/User%20Management%20AngularJs%20Application/media/34c80951-d9d0-491d-91ac-dba06f32b206">
+                                                    AngularJS Controller with TypeScript Object Oriented Approach. Part 1 (Testing).
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="webEssentials" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/User%20Management%20AngularJs%20Application/media/1dcb980d-64c6-4890-b9af-5e815f2df6ab">
+                                                    AngularJS Controller with TypeScript Object Oriented Approach. Part 2.
+                                                </a>
+                                            </li>
+
+
+                                        </ol>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <button class="btn btn-primary btn-custom" data-toggle="modal" data-target="#myModalAdvanced">
+                            More Advanced Tutorials&raquo;
+                        </button>
+                        <div class="modal fade" id="myModalAdvanced" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                        <h4 class="modal-title scrumHeaderFont" id="myModalLabel">
+                                            ASP.NET MVC 5 Tutorials. <span class="text-muted text-muted-scrum">Advanced (201)</span>
+                                        </h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ol class="ol-tuts">
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/9a332813-82fd-409a-b81a-4456000b1d40">Introduction.</a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folder/s/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/1736af95-aa3e-419b-9124-cbaf275ca4e8">
+                                                    ViewBag
+                                                    and ViewData in Controller View Communication.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/d45cd30f-7b5f-4484-867e-66c64d91965f">
+                                                    Action
+                                                    Methods in Controller.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/6d84043c-b778-46a1-8511-7f6dd7702699">
+                                                    Entity
+                                                    Framework. Migration.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/8018f8e3-75ae-40c9-af87-56f63bfdf2c7">
+                                                    Hi
+                                                    to your mom with SignalR.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/a4967902-dfc7-4f56-8c08-d433325f4bcb">
+                                                    jQuery.
+                                                    Brief Introduction.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/7a156d87-0aeb-46a6-86bd-d9386902ee4e">
+                                                    jVS
+                                                    ShortCuts with Autohotkey
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/58b5d7e7-8dfd-4e35-86ac-d21606059717">
+                                                    Brief
+                                                    Overview of TypeScript
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20(201)/media/be46b5cb-3fe8-4ed1-9315-5602592b1ff0">
+                                                    UserViewModel
+                                                    in ASP.Net MVc Authentication
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/a9323a04-d8e8-42f4-95f3-e96a56289d33">
+                                                    KnockoutJs.Part
+                                                    1.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/a9323a04-d8e8-42f4-95f3-e96a56289d33">
+                                                    KnockoutJs.Part
+                                                    2.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/a81a8435-22da-4c52-9849-e942c0a6c595">
+                                                    KnockoutJs.Part
+                                                    3.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/e44e1873-7084-4a02-bb1b-84ee3830ccec">
+                                                    KnockoutJs.Part
+                                                    4.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/10e97cb1-c5ab-4781-8101-c81973c3a9e1">Ajax.ActionLink.</a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/a3da7c1d-b7fc-4f6a-b2aa-3fb7e6fc0ce2">AjaxBeginForm.</a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/85b61d73-837e-470e-9308-95824d79568b">
+                                                    Crud.Identity
+                                                    Auto-Generation.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/98f372f1-9a03-4fa2-8671-60b4ffa8ec3d">
+                                                    AngularJS.
+                                                    Part 1.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/d740bb98-28cb-495d-8fc7-de1beb50b9d5">
+                                                    AngularJS.
+                                                    Part 2.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/625b7aa8-b21c-4d41-bcfd-4bc9ae7c479a">
+                                                    Team
+                                                    Foundation Server. Part 1.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20(201)/media/c4563ff9-8445-4222-b2a2-a6a10ce0a156">
+                                                    Team Foundation Server. Part 2.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/72807a73-14fe-4c89-a17b-10d7f27a2e38">
+                                                    Team Foundation Server. Part 3.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/d00f775d-64b8-4e11-b7f4-c89256e21a05">
+                                                    Team Foundation Server. Part 4.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/23d897a1-f26a-495e-8d08-0733dbb1f780">
+                                                    Team Foundation Server. Part 5.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/57c75aba-4d7e-4e08-b540-14a3b9385e82">
+                                                    Team Foundation Server. Part 6.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/43318841-cc00-4e9c-9007-c2c4eb639ea0">
+                                                    Team Foundation Server. Part 7.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/2b7e77a5-75f5-4630-8100-e79a4b02a7ff">
+                                                    Attribute Routings
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20(201)/media/cebb61b1-ae3f-421d-94db-45c7a149f664">
+                                                    Dependency Injection. Part1.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/1fc8bc1f-ba3c-470e-beeb-53a7c2a80c34">
+                                                    Dependency Injection. Part2.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/4490ab0c-5d32-4da7-8ac3-b56148074a3e">
+                                                    Big Brother Watching You (with Action Filter Attribute)
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="visualStudio" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/2b395884-f66c-43c6-9000-4d5ccf7ce5e4">
+                                                    Cusom Filters in Angular
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="webEssentials" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/f3a0fd6d-e271-40cb-a1c4-4082eb0e8749">
+                                                    TDD in Angular. Part 1. (Jasmine test framework)
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="webEssentials" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/81c0e6e3-ed61-4c3e-b846-d97b7788d077">
+                                                    TDD in Angular. Part 2. (Testing Controllers)
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="webEssentials" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/eb3aa767-611a-4724-bd83-640a9f6536b8">
+                                                    TDD in Angular. Part 3.
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="webEssentials" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/de95b69d-5456-49a3-8912-8c9118aa7470">
+                                                    Angular Pitfalls
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="webEssentials" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/c56f2e90-c182-4fa2-88a9-398c9481fc68">
+                                                    Connecting SignalR with Angular. Part1
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="webEssentials" target="_blank"
+                                                   href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/f881599e-56d7-4194-8f02-bdf46b447f4c">
+                                                    SignalR with AngularJs. Part2
+                                                </a>
+                                            </li>
+                                        </ol>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <h4 class="panel-title title-tut ">
+                        <i class="fa fa-group"></i>
+                        Daily Scrum Meeting
+                        <span>
+                            <a class="sprint title-quiz" target="_blank"
+                               href="https://svitlanashepitsena.visualstudio.com/DefaultCollection/Sniffsters/_backlogs/TaskBoard/Release%201/Sprint%205#_a=requirements">
+                                Sprint
+                                7
+                            </a>
+                        </span>
+                    </h4>
+                    <h4 class="tutDate">
+                        <i class="fa fa-clock-o"></i>
+                        8:30 AM
+                    </h4>
+                    <ul class="list-inline">
+                        <li class="">
+                            <a class="aDefault aScrum" target="_blank"
+                               href="http://www.screencast.com/users/SvitlanaShepitsena/folders/May%20Daily%20Scrum/media/f07949e0-e691-44d4-9e71-ee8469277ffd">
+                                Daily
+                                Scrum May 7
+                            </a>
+                        </li>
+                        <li>
+                            <a class="scrumVideos webEssentials" data-toggle="modal" data-target=".bs-example-modal-sm">
+                                More Scrum Videos&raquo;
+                            </a>
+
+                            <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+                                 aria-hidden="true">
+                                <div class="modal-dialog modal-sm">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+                                            <h4 class="modal-title scrumHeaderFont" id="myModalLabelScrum">
+                                                Scrum Methodology.<br /><span class="text-muted text-muted-scrum">Daily Scrum Meetings</span>
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <ul class="list-unstyled">
+                                                <li class="">
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/May%20Daily%20Scrum/media/f07949e0-e691-44d4-9e71-ee8469277ffd">
+                                                        Daily
+                                                        Scrum May 7
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/May%20Daily%20Scrum/media/c8a6e9b0-1724-4e9e-a80b-fe4d7bb48a93">
+                                                        Daily
+                                                        Scrum May 6
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/April%20Daily%20Scrum/media/95b45bd1-7754-4330-a8a9-841905fc8c4e">
+                                                        Daily
+                                                        Scrum April 28
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/April%20Daily%20Scrum/media/c60a288e-4b97-4c3e-ace6-96c4ecdcb2b5">
+                                                        Daily
+                                                        Scrum April 25
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/April%20Daily%20Scrum/media/75c4df28-7e76-4441-9136-4d0f8bb98645">
+                                                        Final
+                                                        Scrum April 22
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/April%20Daily%20Scrum/media/9b4ef465-c514-47e6-9442-723b08b21b9d">
+                                                        April
+                                                        21
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/April%20Daily%20Scrum/media/643281cb-0539-4b5e-9f4b-36e4ab8901ec">
+                                                        April
+                                                        14
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/April%20Daily%20Scrum/media/5783dbbe-0eb5-48be-9e89-7365555d6553">
+                                                        April
+                                                        11
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/April%20Daily%20Scrum/media/147d9e21-3e20-4103-a3f2-eff7ff016757">
+                                                        April
+                                                        10
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/April%20Daily%20Scrum/media/df54b56f-4ded-4bcb-96d6-84fa967afb6d">
+                                                        April
+                                                        9
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/April%20Daily%20Scrum/media/56179115-b7c3-46a5-b304-c5b20da43435">
+                                                        April
+                                                        8
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/April%20Daily%20Scrum/media/811dbf60-07fc-430b-a212-a5ebe2ae2feb">
+                                                        April
+                                                        4
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/April%20Daily%20Scrum/media/81e680cf-993b-459d-8aaf-0a878c275884">
+                                                        April
+                                                        1
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Daily%20Scrum%20March%202014/media/5c5ea1cd-85cb-47f1-a7d8-93987b06ea1b">
+                                                        March
+                                                        31
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Daily%20Scrum%20March%202014/media/2226ed13-1f7e-4e84-9470-6cfafcab053a">
+                                                        March
+                                                        21
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Daily%20Scrum%20March%202014/media/22b1e913-02a3-4b6c-9097-18081250e770">
+                                                        March
+                                                        16
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Daily%20Scrum%20March%202014/media/6e978f89-5750-46d3-b307-32102918e236">
+                                                        March
+                                                        13
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Daily%20Scrum%20March%202014/media/5efaa621-70b4-48af-9b94-94283ec16f50">
+                                                        March
+                                                        12
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Daily%20Scrum%20March%202014/media/bbcc529b-9e89-46a9-be5f-be0c638ab841">
+                                                        March
+                                                        11
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Daily%20Scrum%20March%202014/media/8dc55f47-5ee5-47a2-9c59-91e0c3345971">
+                                                        March
+                                                        10
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Daily%20Scrum%20March%202014/media/a51ec442-b17f-44f5-aa82-c9b0d64f70fe">
+                                                        March
+                                                        5
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Daily%20Scrum%20March%202014/media/c92a2b77-cf17-4584-8efe-516ce4e03837">
+                                                        March
+                                                        3
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Feb%20Daily%20Scrum/media/5b8afc87-85c5-4064-a7dd-1a35e994ac19">
+                                                        February
+                                                        28
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Feb%20Daily%20Scrum/media/227ea499-1253-4c81-9742-537c76fa1154">
+                                                        February
+                                                        26
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Feb%20Daily%20Scrum/media/1638151f-ffc2-4d65-a392-894a906954c2">
+                                                        February
+                                                        25
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Feb%20Daily%20Scrum/media/b093e777-8b5e-4b6d-8126-4f955e3a0385">
+                                                        February
+                                                        23
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Feb%20Daily%20Scrum/media/80bd63af-7b19-4105-948f-fa4e91c94811">
+                                                        February
+                                                        20
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Feb%20Daily%20Scrum/media/5529c2a5-db40-4a64-b946-a9c3789a5673">
+                                                        February
+                                                        19
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Feb%20Daily%20Scrum/media/3ed28265-a4f4-4207-800f-c4939601946c">
+                                                        February
+                                                        18
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Feb%20Daily%20Scrum/media/c40889e0-643a-4306-810d-2d40e41ce88e">
+                                                        February
+                                                        17
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Feb%20Daily%20Scrum/media/7d98c677-e38d-45ef-acf6-8373b8037b70">
+                                                        February
+                                                        11
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Feb%20Daily%20Scrum/media/d4f0c412-8d51-44d8-9848-6f8918c4bcef">
+                                                        February
+                                                        10
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Feb%20Daily%20Scrum/media/3d2302a7-626a-4e4d-975b-78bebdcc0379">
+                                                        February
+                                                        9
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blankj"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Feb%20Daily%20Scrum/media/18c0c825-4155-402a-9a51-aeaa241aa18e">
+                                                        February
+                                                        7
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Daily%20Scrum%20Meeting/media/1f2d160d-41cc-42ff-82a8-6d621b2a47b3">
+                                                        February
+                                                        6
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Feb%20Daily%20Scrum/media/d5f8fb51-1fd6-4e39-843f-fea71b5d655f">
+                                                        February
+                                                        5
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Daily%20Scrum%20Meeting/media/5e234dc5-9ac5-444e-8366-bb462394b90d">
+                                                        January
+                                                        22
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Daily%20Scrum%20Meeting/media/62348826-8c56-4e12-a9cb-4b326fa3b867">
+                                                        January
+                                                        21
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Daily%20Scrum%20Meeting/media/afc75006-1c7b-463f-8e42-e8770eec0fe1">
+                                                        January
+                                                        20
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/Daily%20Scrum%20Meeting/media/fdbea0cc-6eae-48cf-b78b-c453dd1c0f51">
+                                                        January
+                                                        15
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <hr />
+                    <h3 class="panel-title title-quiz"><i class="fa fa-bell"></i> Visual Studio Shortcuts Quiz</h3>
+                    <p>
+                        <strong>Winner:</strong> Svitlana(10/10)
+                    </p>
+                </div>
+
+
+
+                <div class="col-md-2">
+                    <h4 class="panel-title title-shortcuts">
+                        <i class="fa fa-paperclip"></i>
+                        <a class="" href="https://plus.google.com/u/0/photos/+SvitlanaShepitsenaTemplates/albums">
+                            Useful Tips and Shortcuts
+                        </a>
+
+                    </h4>
+
+                    <ul class="list-unstyled">
+
+                        <li class="liShortcuts">
+                            <a class="" href="/files/WebStorm.htm" target="_blank"><img src="/files/File-Types-HTM-icon.png" alt="" /></a>
+                            <a class="aShortcuts itemNew" target="_blank"
+                               href="https://plus.google.com/photos/112124811760005447903/albums/6010671621582123921">
+                                Web Storm Remapped Shortcuts
+                            </a>
+                            <a href="http://73.50.72.53:8081/settings.jar">
+                                <i class="fa fa-save"></i>
+                            </a>
+
+                        </li>
+                        <li class="liShortcuts">
+                            <a class="" href="/files/WebStorm.htm" target="_blank"><img src="/files/File-Types-HTM-icon.png" alt="" /></a>
+                            <a class="aShortcuts" target="_blank"
+                               href="https://plus.google.com/u/0/photos/112124811760005447903/albums/5978649980730155137">
+                                Visual
+                                Studio Remapped Shortcuts
+                            </a>
+                        </li>
+
+                        <li class="liShortcuts">
+                            <a class="" href="/files/Templates.htm" target="_blank">
+                                <img src="/files/File-Types-HTM-icon.png"
+                                     alt="Gene_Kelly" />
+                            </a>
+                            <a class="aShortcuts" target="_blank"
+                               href="https://plus.google.com/u/0/photos/112124811760005447903/albums/5960054638482238961">
+                                Visual
+                                Studio C# Templates
+                            </a>
+
+                        </li>
+                        <li class="liShortcuts">
+                            <a class="" href="/files/TS.htm" target="_blank">
+                                <img src="/files/File-Types-HTM-icon.png"
+                                     alt="Gene_Kelly" />
+                            </a>
+                            <a class="aShortcuts" target="_blank"
+                               href="https://plus.google.com/photos/112124811760005447903/albums/5999020845647697601">
+                                Visual Studio
+                                TypeScript (JS) Templates
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+
+
+                <div class="col-md-2">
+                    <img class="img-responsive" src="img/WebStorm2.png" />
+                </div>
+
+
+                <div class="col-md-2 pull-right">
+                    <h4 class="panel-title title-tut ">
+                        <i class="fa fa-camera-retro"></i>
+                        Our Watchers
+                    </h4>
+                    <br />
+                    <ul class="list-inline">
+
+                        <li>
+                            <a href="https://www.facebook.com/oksana.slobozhaniuk" class="thumbnail thumbnail-watchers ">
+                                <img class="img-responsive" src="img/Oksana.jpg" alt="...">
+                            </a>
+                            <h5 class="text-center">Oksana</h5>
+                        </li>
+
+                        <li>
+                            <a href="https://www.facebook.com/tatyana.merseburg" class="thumbnail thumbnail-watchers ">
+                                <img class="img-responsive" src="img/Tanya.jpg" alt="...">
+                            </a>
+                            <h5 class="text-center">Tatyana</h5>
+                        </li>
+                    </ul>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <!--
+        <div class="navbar navbar-inverse">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-10">
+                        <a class="navbar-brand" target="_blank" href="http://www.stickk.com">stickK</a>
+                    </div>
+                    <div id="stick-contr" class="col-md-2">
+                        <span class="contract alert alert-warning"><small>CONTRACT</small> #18134</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    -->
+    <div class="main-content-wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-10 col-md-9 col-sm-12 col-xs-12 content-wrapper">
+                    <div class="row">
+                        <div class="col-lg-6 project-wrapper">
+                            <div class="microsoftImgWrapper">
+                                <img class="img-microsoft img-responsive " src="img/microsoft-edu-research-program.png"
+                                     alt="Microsoft Educational Research Program">
+                            </div>
+                            <div class="bs-example bs-example-tabs">
+                                <ul id="myTab" class="nav nav-tabs">
+                                    <li class="active">
+                                        <a data-toggle="tab" href="#home">Our Current Project</a>
+                                    </li>
+                                    <li class="">
+                                        <a data-toggle="tab" href="#profile">Our Projects</a>
+                                    </li>
+                                </ul>
+                                <div id="myTabContent" class="tab-content">
+                                    <div id="home" class="tab-pane fade active in">
+                                        <ul class="media-list ulM">
+                                            <li class="media">
+                                                <a class="pull-left text-dark" target="_blank"
+                                                   href="http://sniffsters.azurewebsites.net/">
+                                                    <img src="img/Sniffsters-Logo.jpg"
+                                                         alt="Sniffsters" />
+                                                </a>
+
+                                                <div class="media-body">
+                                                    <h2 class="h2Sniffster">
+                                                        <a class="text-dark" target="_blank"
+                                                           href="http://sniffsters.azurewebsites.net/">Sniffsters.com</a>
+                                                    </h2>
+
+                                                    <p>
+                                                        Sniffsters.com is a business oriented social networking site that features
+                                                        dog breeders and allows them to use this platform to display information
+                                                        about their business (available and previous litters etc) and replace the
+                                                        need for them in the future to have their own site.
+                                                    </p>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div id="profile" class="tab-pane fade">
+                                        <ul class="media-list ulM">
+                                            <li class="media">
+                                                <a class="pull-left text-dark" target="_blank"
+                                                   href="http://sniffsters.azurewebsites.net/">
+                                                    <img src="img/REMAX1Logo.png"
+                                                         alt="Remax 1st Class" />
+                                                </a>
+
+                                                <div class="media-body">
+                                                    <h2 class="h2Sniffster">
+                                                        <a class="text-dark" target="_blank"
+                                                           href="http://www.remax1stclass.com/">Remax1stclass.com</a>
+                                                    </h2>
+
+                                                    <p>
+                                                    </p>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div id="dropdown1" class="tab-pane fade">
+                                        <p>
+                                            Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic
+                                            lomo retro fanny pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork
+                                            tattooed craft beer, iphone skateboard locavore carles etsy salvia banksy hoodie helvetica.
+                                            DIY synth PBR banksy irony. Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh
+                                            mi whatever gluten-free, carles pitchfork biodiesel fixie etsy retro mlkshk vice blog.
+                                            Scenester cred you probably haven't heard of them, vinyl craft beer blog stumptown.
+                                            Pitchfork sustainable tofu synth chambray yr.
+                                        </p>
+                                    </div>
+                                    <div id="dropdown2" class="tab-pane fade">
+                                        <p>
+                                            Trust fund seitan letterpress, keytar raw denim keffiyeh etsy art party before they sold out
+                                            master cleanse gluten-free squid scenester freegan cosby sweater. Fanny pack portland seitan
+                                            DIY, art party locavore wolf cliche high life echo park Austin. Cred vinyl keffiyeh DIY
+                                            salvia PBR, banh mi before they sold out farm-to-table VHS viral locavore cosby sweater.
+                                            Lomo wolf viral, mustache readymade thundercats keffiyeh craft beer marfa ethical. Wolf
+                                            salvia freegan, sartorial keffiyeh echo park vegan.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="row">
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+
+                        <img class="col-xs-12 camImg" id="camImg" src="img/loading.jpg"
+                             onmouseover=" javascript:fixMenuColPos(this); /*showAllMenuCols();*/ "
+                             onmouseout=" javascript:hideAllMenuLayers(); " onload=" javascript:updateID();startPoll(); "
+                             onerror=" javascript:showErrorImage(); " style="border: 1px solid # @BORDERCOL;">
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-12 col-xs-12 sidebar-content">
+                    <div class="row">
+                        <div class="col-sm-12 ">
+                            <div class="panel wellDashboard">
+                                <h3 class="h3Dashboard">Dashboard (Andriy)</h3>
+                                <hr />
+                                <ul class="media-list">
+
+                                    <li class=" media">
+                                        <a class="pull-left" target="_blank" href="http://activitymanager.bodymedia.com/balance/tab.do">
+                                            <img class="img-responsive" src="img/bodymedia.png" alt="Bodymedia Fit." />
+                                        </a>
+                                    </li>
+
+                                    <li class="media">
+                                        <ul class="list-inline">
+                                            <li class="myWeight">
+                                                My Weight:<strong>
+                                                    186.0 lbs
+                                                </strong>
+                                            </li>
+                                            <li class="myWeight">
+                                                My Goal:<strong>
+                                                    180.0lbs
+                                                </strong>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="media">
+                                        <a class="pull-left" target="_blank" href="http://news.xbox.com/xbox-one">
+                                            <img class="img-responsive" src="/img/XboxOne-horizontal.png" alt="" />
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="row">
+                                    <a class="col-lg-4" target="_blank" href="https://www.ksrchampionship.com/">
+                                        <img class="img-responsive " src="/img/championship.png" alt="" />
+                                    </a>
+                                    <a class="col-lg-8" target="_blank"
+                                       href="http://www.xbox.com/en-US/xbox-one/games/kinect-sports-rivals">
+                                        <img class="img-responsive" src="/img/xbox-rivals.jpg" alt="" />
+                                    </a>
+                                </div>
+                                <br />
+
+                                <div class="row">
+                                    <a class="col-lg-8 col-lg-offset-2" target="_blank"
+                                       href="http://fighter-within.ubi.com/fighter-within/en-US/home/">
+                                        <img class="img-responsive" src="/img/fighter-within.png" alt="" />
+                                    </a>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="row">
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+
+
+                        </div>
+                    </div>
+                    <div class="thumbnail">
+                        <div class="caption">
+
+                            <div class="row img-wrapper">
+                                <img src="img/b.png" data-target="#myModalBootstrap" class="img-responsive col-sm-12" data-toggle="modal"
+                                     alt="Alternate Text" />
+                            </div>
+
+                            <h3 class="text-center" data-target="#myModalBootstrap" data-toggle="modal">Bootstrap 3.0 in ASP.Net MVC 5</h3>
+
+                            <div class="modal fade" id="myModalBootstrap" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                                 aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close moreModal" data-dismiss="modal"
+                                                    aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title scrumHeaderFont" id="myModalLabel">Bootstrap 3.0 in ASP.Net MVC 5</h4>
+                                        </div>
+                                        <div class="modal-body">
+
+                                            <ol class="ol-tuts">
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/979be712-e8a1-4d3f-b9cf-e3494d3c0a2e">
+                                                        Creating
+                                                        an additional navbar with navbar-search form.
+                                                    </a>
+                                                </li>
+
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/c95abcc1-5b8f-4444-b52c-273e71f3b222">
+                                                        Creating
+                                                        a responsive designt of a page using Bootstrap grid system.
+                                                    </a>
+                                                </li>
+
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/bed48216-6dec-4a0a-9572-6eb95d1a733f">
+                                                        Bootstrap
+                                                        design for register page. Working with grid system and form elements.
+                                                    </a>
+                                                </li>
+                                            </ol>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail">
+                        <div class="caption">
+                            <div class="row img-wrapper">
+                                <img src="img/mailbox.jpg" class="img-responsive col-sm-12" data-target="#myModalCrud" data-toggle="modal"
+                                     alt="Alternate Text" />
+                            </div>
+                            <h3 class="h3Tuts text-center" data-target="#myModalCrud" data-toggle="modal">
+                                Building a Mail Service App <br />
+                                <span class="text-muted-scrum"></span>
+                            </h3>
+
+                            <div class="modal fade" id="myModalCrud" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                                 aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close moreModal" data-dismiss="modal"
+                                                    aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title scrumHeaderFont" id="myModalLabel">
+                                                ASP.NET MVC 5 Tutorials <br /> <span class="text-muted text-muted-scrum">Building a Mail Service Application</span>
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+
+                                            <ol class="ol-tuts">
+
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/89956091-d5af-4c56-a039-738c9d75e089">
+                                                        Creating
+                                                        a Mailbox. Part 1.
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20(101)/media/6d3dcee1-880d-4e69-b12e-f8331b5cec54">
+                                                        Creating
+                                                        a Mailbox. Part 2. IRepository Interface
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/48e74d2f-a8b6-4950-8770-a3182624eabb">
+                                                        Creating
+                                                        a Mailbox. 2 Level Abstraction
+                                                    </a>
+                                                </li>
+
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20(101)/media/d9fa3dfa-90b2-4b34-9d6b-bf95aff70379">
+                                                        ASP.Net
+                                                        MVC Optimization. Views.
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/57cacba8-b561-4afd-82b6-523534d346cf">
+                                                        ASP.Net
+                                                        MVC Optimization. Controllers.
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/84b42658-fda9-4016-8d20-bf5643e5a50d">
+                                                        TDD
+                                                        using Mocking Database.
+                                                    </a>
+                                                </li>
+
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/7f2719a7-4965-443d-a31e-959edb48d9d2">
+                                                        CRUD.
+                                                        Sending a message functionality.
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20(101)/media/841d7162-12c9-4d60-9526-dacf2921f021">
+                                                        CRUD.
+                                                        Delete a message functionality.
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/d37ffdef-35b3-4793-bda2-d4c3040b6fa6">
+                                                        Message
+                                                        Notification with SignalR. Part 1
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/1ebd7fde-db46-498b-8d5c-8572d2a4b4ed">
+                                                        Message
+                                                        Notification with SignalR. Part 2
+                                                    </a>
+                                                </li>
+
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/a9f63389-6b3c-4880-b288-ae16f1d72c89">
+                                                        Message
+                                                        Notification with SignalR. Part 3
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/efafc610-ae97-42aa-83ea-82c856ab3d45">
+                                                        Message
+                                                        Notification with SignalR. Part 4
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/eb03f4cb-32c3-498c-a35b-edd99d7c1988">
+                                                        Message
+                                                        Notification with SignalR. Part 5
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/19991f9f-1972-45c2-8230-0904432cfc7c">
+                                                        Message
+                                                        Notification with SignalR. Part 6
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/75a2bb40-8636-4d46-baf0-ba8856703980">
+                                                        AngularJs
+                                                        MVC Framework. Part 1
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/f3a0fd6d-e271-40cb-a1c4-4082eb0e8749">
+                                                        TDD in Angular. Part 1. (Jasmine test framework)
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/81c0e6e3-ed61-4c3e-b846-d97b7788d077">
+                                                        TDD in Angular. Part 2. (Testing Controllers)
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/3234ab90-1040-486c-b47d-cfc7217f4f40">
+                                                        AngularJs
+                                                        MVC Framework. Part 2. (Testing Controllers)
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/eb3aa767-611a-4724-bd83-640a9f6536b8">
+                                                        TDD in Angular. Part 3.
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/50cce962-7b9f-4acc-ae45-d309019cb940">
+                                                        AngularJs MVC Framework. Testing Creating a Message Functionality. Part 1.
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="webEssentials" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/fb34489b-106a-45e9-8d2c-d367f42c6f7a">
+                                                        AngularJs MVC Framework. Testing Creating a Message Functionality. Part 2.
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="webEssentials" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Essentials%20%28101%29/media/bfd23be8-a50c-4143-a4aa-a5a7bf63f976">
+                                                        AngularJs. Cteating Custom Directives
+                                                    </a>
+                                            </ol>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail">
+                        <div class="caption">
+
+                            <div class="row img-wrapper">
+                                <img src="img/tfs1.png" class="img-responsive col-sm-12" data-target="#myModalTFC" data-toggle="modal"
+                                     alt="Alternate Text" />
+                            </div>
+                            <!--
+                            <h3>Manual CRUD Functionality in ASP.Net MVC 5. <br />
+                                <span class="text-muted-scrum">Building a Mail Service Application</span>
+                            </h3>
+                            -->
+                            <h3 class="text-center" data-target="#myModalTFC" data-toggle="modal">
+                                VS Team Foundation Server <br />
+                                <span class="text-muted-scrum"></span>
+                            </h3>
+
+                            <div class="modal fade" id="myModalTFC" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                                 aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close moreModal" data-dismiss="modal"
+                                                    aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title scrumHeaderFont" id="myModalLabel">Team Foundation Server</h4>
+                                        </div>
+                                        <div class="modal-body">
+
+                                            <ol class="ol-tuts">
+
+                                                <li>
+                                                    <a class="visualStudio"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/625b7aa8-b21c-4d41-bcfd-4bc9ae7c479a"
+                                                       target="_blank">Team Foundation Server. Part 1.</a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20(201)/media/c4563ff9-8445-4222-b2a2-a6a10ce0a156"
+                                                       target="_blank">
+                                                        Team Foundation Server. Part 2.
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/72807a73-14fe-4c89-a17b-10d7f27a2e38"
+                                                       target="_blank">
+                                                        Team Foundation Server. Part 3.
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/d00f775d-64b8-4e11-b7f4-c89256e21a05">
+                                                        Team Foundation Server. Part 4.
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/23d897a1-f26a-495e-8d08-0733dbb1f780">
+                                                        Team Foundation Server. Part 5.
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="visualStudio" target="_blank"
+                                                       href="http://www.screencast.com/users/SvitlanaShepitsena/folders/ASP.NET%20MVC%205%20Tutorials.%20Advanced%20%28201%29/media/57c75aba-4d7e-4e08-b540-14a3b9385e82">
+                                                        Team Foundation Server. Part 6.
+                                                    </a>
+                                                </li>
+                                            </ol>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <br /> <br />
+    <footer>
+        <div class="container">
+            <br />
+
+            <div class="row">
+
+                <div class="col-md-12">
+                    <div class="copyright">
+                        <p>� 2014 Copyright stickK.com</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="passLyr" class="passLayer" onmouseover=" javascript:showLayer('passLyr'); ">
+
+        <div align="center" style="padding: 20px 20px; position: relative;"
+             onmouseover=" javascript:hideAllMenuLayers();showLayer('passLyr'); ">
+            <table width="199" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td>
+                        <p id="passHeading" align="center">Password Please!</p>
+
+                        <form name="form" action="javascript:sendPass()">
+                            <p align="center">
+                                User:
+                                <input name="user" type="text" id="user">
+                            </p>
+
+                            <p align="center">
+                                Pass:
+                                <input name="pass" type="password" id="pass">
+                            </p>
+
+                            <p align="right">
+                                <input name="login" type="submit" id="login" value="Login">
+                            </p>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div id="menu_fps" class="menu"
+         onmouseover=" javascript:showAllMenuCols();hideAllMenuChildren();updateFpsMenu();setLyr(this, 'menu_fps_child', true, 0);showLayer('menu_fps_child'); ">
+        <center>Fps</center>
+    </div>
+
+    <div id="menu_quality" class="menu"
+         onmouseover=" javascript:showAllMenuCols();hideAllMenuChildren();updateQualityMenu();setLyr(this, 'menu_quality_child', true, 0);showLayer('menu_quality_child'); ">
+        <center>Quality</center>
+    </div>
+
+    <div id="menu_scale" class="menu"
+         onmouseover=" javascript:showAllMenuCols();hideAllMenuChildren();setLyr(this, 'menu_scale_child', true, 0);showLayer('menu_scale_child'); ">
+        <center>Scale</center>
+    </div>
+
+    <div id="menu_sound" class="menu"
+         onmouseover=" javascript:showAllMenuCols();hideAllMenuChildren();setLyr(this, 'menu_sound_child', true, 0);showLayer('menu_sound_child'); ">
+        <center>Sound</center>
+    </div>
+
+    <div id="menu_about" class="menu" style="border-right: 1px solid black;"
+         onmouseover=" javascript:showAllMenuCols();hideAllMenuChildren();setLyr(this, 'menu_about_child', true, 0);showLayer('menu_about_child'); ">
+        <center>About</center>
+    </div>
+
+    <div id="menu_fps_child" class="menu_child" onmouseover=" javascript:showAllMenuCols();showLayer('menu_fps_child'); "
+         onmouseout=" javascript:hideLayer('menu_fps_child'); "
+         onclick=" javascript:updateFpsMenu();hideLayer('menu_fps_child'); ">
+        <a id="fps_30" class="menu_Item" href="javascript:setFps(30);cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">30</a>
+        <a id="fps_15" class="menu_Item" href="javascript:setFps(15);cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">15</a>
+        <a id="fps_10" class="menu_Item" href="javascript:setFps(10);cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">10</a>
+        <a id="fps_5" class="menu_Item" href="javascript:setFps(5);cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">5</a>
+        <a id="fps_1" class="menu_Item" style="border-bottom: 1px solid black;" href="javascript:setFps(1);cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">1</a>
+    </div>
+
+    <div id="menu_quality_child" class="menu_child"
+         onmouseover=" javascript:showAllMenuCols();showLayer('menu_quality_child'); "
+         onmouseout=" javascript:hideLayer('menu_quality_child'); "
+         onclick=" javascript:updateQualityMenu();hideLayer('menu_quality_child'); ">
+        <a id="q_75" class="menu_Item" href="javascript:setQ(75);cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">75 %</a>
+        <a id="q_50" class="menu_Item" href="javascript:setQ(50);cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">50 %</a>
+        <a id="q_40" class="menu_Item" href="javascript:setQ(40);cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">40 %</a>
+        <a id="q_30" class="menu_Item" href="javascript:setQ(30);cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">30 %</a>
+        <a id="q_20" class="menu_Item" href="javascript:setQ(20);cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">20 %</a>
+        <a id="q_10" class="menu_Item" href="javascript:setQ(10);cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">10 %</a>
+        <a id="q_5" class="menu_Item" href="javascript:setQ(5);cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">5 %</a>
+        <a id="q_1" class="menu_Item" style="border-bottom: 1px solid black;" href="javascript:setQ(1);cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">1 %</a>
+    </div>
+
+    <div id="menu_scale_child" class="menu_child"
+         onmouseover=" javascript:showAllMenuCols();showLayer('menu_scale_child'); "
+         onmouseout=" javascript:hideLayer('menu_scale_child'); " onclick=" javascript:hideLayer('menu_scale_child'); ">
+        <a id="z1" class="menu_Item" href="javascript:scaleIn();cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">Up</a>
+        <a id="z2" class="menu_Item" href="javascript:scaleOut();cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">Down</a>
+        <a id="z3" class="menu_Item" style="border-bottom: 1px solid black;" href="javascript:scaleOrg();cTO();"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">1:1</a>
+    </div>
+
+    <div id="menu_sound_child" class="menu_child"
+         onmouseover=" javascript:showAllMenuCols();showLayer('menu_sound_child'); "
+         onmouseout=" javascript:hideLayer('menu_sound_child'); " onclick=" javascript:hideLayer('menu_sound_child'); ">
+        @SOUNDLIST<a id="s@SOUND_ID" class="menu_Item_wide" href="javascript:playSound('@SOUND_ID')"
+                     onmouseover=" this.style.backgroundColor = '#CEE6F9' "
+                     onmouseout=" this.style.backgroundColor = '#FBFBFB' " onfocus=" this.blur() ">Play: @SOUND_FILE</a>@SOUNDLIST
+        <a id="s_target" class="menu_Item_wide" style="border-bottom: 1px solid black;" href="javascript:" onmouseover=""
+           onmouseout="" onfocus=" this.blur() ">@SOUNDTARGETS</a>
+    </div>
+
+    <div id="menu_about_child" class="menu_child"
+         onmouseover=" javascript:showAllMenuCols();showLayer('menu_about_child'); "
+         onmouseout=" javascript:hideLayer('menu_about_child'); " onclick=" javascript:hideLayer('menu_about_child'); ">
+        <a id="a1" class="menu_Item" href="http://www.yawcam.com" onmouseover=" this.style.backgroundColor = '#CEE6F9' "
+           onmouseout=" this.style.backgroundColor = '#FBFBFB' " onfocus=" this.blur() ">Yawcam</a>
+        <a id="a2" class="menu_Item" style="border-bottom: 1px solid black;" href="http://www.yawcam.com/menuinfo.php"
+           onmouseover=" this.style.backgroundColor = '#CEE6F9' " onmouseout=" this.style.backgroundColor = '#FBFBFB' "
+           onfocus=" this.blur() ">This menu</a>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+        ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+
+    <script src="js/bootstrap.min.js"></script>
+</body>
+
+</html>
