@@ -1,39 +1,39 @@
-﻿
+/**********************
+ Colors
+***********************/
+/**********************
+ Colors
+***********************/
 .navbar {
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
-    margin-bottom: 0px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  margin-bottom: 0px;
 }
-
 .navbar-brand {
-    color: #DCDCDC !important;
-    font-size: 28px !important;
+  color: #DCDCDC !important;
+  font-size: 28px !important;
 }
-
 .navStickk {
-    text-shadow: #96cee6 0px 1px 0px;
+  text-shadow: #96cee6 0px 1px 0px;
 }
 .mc {
-    padding-left: 15px;
+  padding-left: 15px;
 }
 .h2-mc {
-    color: whitesmoke;
-    margin-top: 10px;
+  color: whitesmoke;
+  margin-top: 10px;
 }
-
 .navbar-mc {
-    background-color: #6393A7 !important;
+  background-color: #6393a7 !important;
 }
-
 .navbar-right {
-    color: #DCDCDC !important;
-    font-size: 16px !important;
-    padding-right: 20px !important;
+  color: #f0f6fa !important;
+  font-size: 16px !important;
+  padding-right: 20px !important;
 }
-
 .navbar-inverse {
-    background-color: #2C5261 !important;
-    border-color: #2C5261 !important;
+  background-color: #2c5261 !important;
+  border-color: #2c5261 !important;
 }
