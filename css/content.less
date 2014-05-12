@@ -1,373 +1,37 @@
 ﻿@import "myconstants";
+@import "elementsCustom";
+
 
 /**********************
- Colors
+ =Content
 ***********************/
 
 body {
+  background-color: @color-content;
   color: @color-gray-mid !important;
-  background-color: @color-white;
   font-family: "Open Sans", "Helvetica Neue" 'Helvetica​' 'Arial' sans-serif;
   line-height: 24px !important;
 }
-.fa-blue{
-  color: @color-primary;
-}
 
-.my-repeat-animation.ng-enter,
-.my-repeat-animation.ng-leave,
-.my-repeat-animation.ng-move {
-  -webkit-transition: 0.5s linear all;
-  transition: 0.5s linear all;
-  position:relative;
-}
-
-.my-repeat-animation.ng-enter {
-  left:-10px;
-  opacity:0;
-}
-
-.my-repeat-animation.ng-enter-stagger {
-  /* this will have a 100ms delay between each successive leave animation */
-  -webkit-transition-delay: 0.2s;
-  transition-delay: 0.2s;
-
-  /* in case the stagger doesn't work then these two values
-must be set to 0 to avoid an accidental CSS inheritance */
-  -webkit-transition-duration: 0s;
-  transition-duration: 0s;
-}
-
-.my-repeat-animation.ng-enter.ng-enter-active {
-  left:0;
-  opacity:1;
-}
-
-.my-repeat-animation.ng-leave {
-  left:0;
-  opacity:1;
-}
-.my-repeat-animation.ng-leave.ng-leave-active {
-  left:-10px;
-  opacity:0;
-}
-
-.my-repeat-animation.ng-move {
-  opacity:0.5;
-}
-.my-repeat-animation.ng-move.ng-move-active {
-  opacity:1;
-}
-
-.sample-show-hide.ng-hide-add, .sample-show-hide.ng-hide-remove {
-  -webkit-transition:all linear 2s;
-  -moz-transition:all linear 2s;
-  -o-transition:all linear 2s;
-  transition:all linear 2s;
-  display:block!important;
-}
-
-.sample-show-hide.ng-hide-add.ng-hide-add-active,
-.sample-show-hide.ng-hide-remove {
-  opacity:0;
-}
-
-.sample-show-hide.ng-hide-add,
-.sample-show-hide.ng-hide-remove.ng-hide-remove-active {
-  opacity:1;
-}
-
-.font-contract {
-  color: @color-white !important;
-}
-.jumboHead{
-  background-color: @color-light-jumbo !important;
-  padding-right: 15px;
-  padding-left: 15px;
-  padding-top: 5px;
-  padding-bottom: 10px;
-}
-.btn-primary{
-  padding-right: 5px;
-  padding-left: 5px;
-  padding-top: 3px;
-  padding-bottom: 3px;
-  background-color: @color-primary;
-  border-color: @color-primary;
-  font-size: 11px;
-}
-.btn-primary:focus{
-  background-color: @color-warning;
-  border-color: @color-warning;
-}
-.btn-primary:hover{
-  background-color: @color-warning;
-  border-color: @color-warning;
-}
-/*.btn-link{
-  color: #2C5261;
-  font-size: 13px;
-}*/
-.pTut{
-  margin-bottom: 0px;
-}
-
-.contract {
-  font-family: "Josefin Sans" !important;
-  font-size: 16px;
-  padding: 7px !important;
-}
-.main-content-wrapper {
-  font-size: 1.1em;
-  color: @color-gray-mid;
-  line-height: 20px;
-}
 .content-wrapper {
-  background-color: #f6f9fb;
   padding-top: 15px;
   padding-bottom: 15px;
   padding-right: 30px;
   padding-left: 30px;
 }
-.project-wrapper {
-  font-size: 1.2em;
-  line-height: 23px;
-}
-.sidebar-content {
-  padding-top: 30px;
-  background-color: #F6F9FB;
-  padding-left: 15px;
-  padding-right: 10px;
-}
-.aWatchers {
-  font-size: 1.2em;
-}
-.camImg {
-  /*
-  width: 2089px;
-  height: 1563px;
-  */
-}
-th {
+
+.main-content-wrapper {
   font-size: 1.1em;
+  color: @color-gray-mid;
+  line-height: 20px;
 }
 
-.video-container {
-}
-
-.video-wrapper {
-  margin: 0 auto 0 auto;
-}
-
-.text-header {
-  font-size: 1.1em;
-}
-
-.bs-example-tabs {
-  min-height: 198px !important;
-}
-
-.modal-sm {
-  width: 300px !important;
-}
-
-.table > tbody > tr > td {
-  line-height: 24px !important;
-}
-
-li.list-group-item.active:focus {
-  background-color: @color-primary !important;
-  border-color: @color-primary !important;
-}
-
-li.list-group-item.active {
-  background-color: @color-primary !important;
-  border-color: @color-primary !important;
-  border-top-left-radius: 1px;
-  border-top-right-radius: 1px;
-}
-.list-group-item:first-child {
-  border-top-left-radius: 1px;
-  border-top-right-radius: 1px;
-}
-li.list-group-item.active a:focus {
-  color: white;
-}
-
-a:hover{
-  color: @color-primary !important;
-}
-li.list-group-item.active a {
-  color: white;
-}
-
-.microsoftImgWrapper {
-  margin-top: 20px;
-  margin-bottom: 20px !important;
-}
-
-.scrumHeaderFont {
-  font-size: 1.2em;
-  line-height: 26px !important;
-}
-
-.text-muted-scrum {
-  font-size: 1.2em;
-  color: @color-primary !important;
-}
-.aTut{
-  font-size: .9em;
-  color: @color-warning;
-  text-decoration: underline;
-}
-.aShortcuts {
-  font-size: .9em;
-}
-.itemNew {
-  color: @color-warning;
-
-}
-.liShortcuts {
-  margin-bottom: 3px;
-}
-i {
-  margin-right: 3px;
-}
-
-a{
-  color: #739EB0;
-}
-a:focus{
-  color: #739EB0;
-}
-.aDefault{
-  color: #5c5c5c;
-}
-.btn-custom {
-  margin-top: 5px;
-}
-
-.competition {
-  background-color: #FCF8F2;
-}
-
-.headComp {
-  color: #494949;
-  font-weight: 400;
-}
-
-
-.textComp {
-  font-size: 22px;
-}
-
-.ulM {
-  margin-bottom: 30px !important;
-  margin-top: 10px !important;
-}
-
-.dashWell {
-  padding-bottom: 5px !important;
-}
-
-.panel-quiz-heading {
-  background-color: #EBEBEB !important;
-  border-color: #d3d3d3 !important;
-}
-
-.panel-tut-heading {
-  background-color: #EBEBEB !important;
-  border-color: #d3d3d3!important;
-  padding-bottom: 7px !important;
-}
-
-.panel-quiz {
-  border-color: #d3d3d3 !important;
-  margin-top: 10px !important;
-  background-color: #F9F9F9;
-}
-.panel {
-  background-color: #F9F9F9;
-}
-.title-quiz {
-  color: @color-primary !important;
-  padding-bottom: 5px;
-  margin-bottom: 5px;
-}
-.title-tut {
-  font-size: 20px !important;
-  padding-top: 10px;
-  color: @color-primary !important;
-}
-.title-shortcuts {
-  font-size: 20px !important;
-  padding-top: 10px;
-  color: @color-primary !important;
-  margin-bottom: 10px;
-}
-.aScrum{
-  font-size: 13px;
-}
-.tutDay {
-  font-size: 15px;
-}
-
-.th-quiz {
-  background-color: #F5F5F5 !important;
-}
-
-.th-q {
-  background-color: #FCFCFC !important;
-}
-
-.td-q {
-  padding-bottom: 15px !important;
-}
-
-.webEssentials {
-  color: @color-warning;
-  font-weight: 500 !important;
-  font-size: 13px;
-}
-.table-scrum {
-  margin-bottom: 0px !important;
-}
-
-.visualStudio {
-  color: #4d6a83;
-  padding-top: 5px;
-  padding-bottom: 4px;
-  background-color: #FAFAFA !important;
-}
-
-.ourWatchersPanel {
-  padding-top: 20px !important;
-  padding-bottom: 10px;
-  background-color: @color-primary;
-}
-li.list-group-item.active {
-
-  background-color: @color-primary;
-}
-.thumbnail-watchers {
-  margin-bottom: 1px;
-}
-
-.vs {
-  color: #68217A;
-}
-
-.bodymed {
-  padding: 5px !important;
-  margin-bottom: 0px !important;
-}
-
-.textWhite {
-  color: white !important;
-}
-
-.label-new {
-  font-size: 9px !important;
+/**********************
+ =Tutorials
+***********************/
+.aWebStorm{
+  font-size: 18px;
+  color: @color-gray-mid;
 }
 
 .tutDate {
@@ -375,27 +39,98 @@ li.list-group-item.active {
   margin-bottom: 1px !important;
   font-size: 14px;
   padding-bottom: 5px;
-  /*
-background-color: #56a3c8;
-*/
 }
+
+.pTut{
+  margin-bottom: 0px;
+}
+
+.aTut{
+  font-size: .9em;
+  color: @color-warning;
+  text-decoration: underline;
+}
+
+.title-tut {
+  font-size: 20px !important;
+  padding-top: 10px;
+  color: @color-primary-dark !important;
+}
+.tutFont{
+  line-height: 1.5em;
+}
+.tutDay {
+  font-size: lem;
+  font-weight: 500;
+}
+
+.alert-tutorial {
+  margin-top: 20px !important;
+  padding: 6px !important;
+}
+/**********************
+ =Shortcuts
+***********************/
+
+.aShortcuts {
+  font-size: .9em;
+}
+.liShortcuts {
+  margin-bottom: 3px;
+}
+.aDefault{
+  color: #5c5c5c;
+}
+.title-quiz {
+  color: @color-primary-dark !important;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+}
+.title-shortcuts {
+  font-size: 20px !important;
+  padding-top: 10px;
+  color: @color-primary-dark !important;
+  margin-bottom: 10px;
+}
+/**********************
+ =Camera
+***********************/
+.camImg {
+  border: 1px solid
+}
+
+
+/**********************
+ =Watchers
+***********************/
+
+.thumbnail-watchers {
+  margin-bottom: 1px;
+}
+
+.ourWatchersPanel {
+  padding-top: 20px !important;
+  padding-bottom: 10px;
+  background-color: @color-primary;
+}
+.aWatchers {
+  font-size: 1.2em;
+}
+
+
 
 .ol-tuts {
   padding-left: 25px !important;
 }
 
-.td-more {
-  padding-right: 10px !important;
-}
 
-.tabel-date {
-  margin-top: 10px !important;
+/**********************
+ =Scrum
+***********************/
+.scrumHeaderFont {
+  font-size: 1.3em;
+  line-height: 1.9em;
 }
-
-.label-processing {
-  font-size: 10px !important;
-}
-
 .scrumVideos {
   font-size: 12px !important;
   color: @color-warning;
@@ -408,97 +143,21 @@ background-color: #56a3c8;
   color: @color-gray-mid;
 }
 
+.text-muted-scrum {
+  font-size: 1.1em;
+  color: @color-primary !important;
+}
+
 .sprint:hover {
   text-decoration: underline !important;
   color: @color-warning;
 }
 
-.text-gray {
-  color: @color-gray-mid;
-}
-.img-tuts {
-}
-.h3Democracy {
-  margin-bottom: 5px;
-  margin-top: 5px;
-}
-
-.h3{
-  font-size: 1.4em;
-  padding-top: 15px;
-}
-.img-wrapper {
-  margin-bottom: 10px;
-}
-
-.text-dark {
-  color: #494949;
+.aScrum{
+  font-size: .9em;
   text-decoration: underline;
 }
 
-
-.label-warning {
-  background-color: #F2DEDE !important;
-  color: @color-warning;
-  padding: 3px !important;
-  font-style: italic;
-}
-
-.label-success {
-  background-color: #DFF0D8 !important;
-  color: #3c763d !important;
-  padding: 3px !important;
-  font-style: italic;
-  font-size: 10px !important;
-}
-.font-white {
-  color: @color-white;
-}
-
-
-.tbodyFont {
-  font-size: 13px !important;
-}
-
-.h2Sniffster {
-  font-size: 26px !important;
-  margin-top: 1px !important;
-}
-
-.h4Democracy {
-  font-size: 14px !important;
-  margin-bottom: 5px !important;
-  margin-top: 0px !important;
-}
-
-.alert-tutorial {
-  margin-top: 20px !important;
-  padding: 6px !important;
-}
-
-.h3Dashboard {
-  color: @color-white;
-  margin-bottom: 0px !important;
-  margin-top: 5px !important;
-}
-.myWeight {
-  color: @color-white;
-  font-size: 1.2em;
-}
-.h2Current {
-  margin-bottom: 10px !important;
-  margin-top: 5px !important;
-}
-
-.wellDashboard {
-  background-color: #739EB0;
-  padding: 15px !important;
-
-}
-.panel {
-  border-radius: 1px;
-
-}
 
 .moreModal:hover {
   background-color: #EBEBEB !important;
@@ -508,111 +167,109 @@ background-color: #56a3c8;
   background-color: #f8f8f8 !important;
 }
 
+
+/**********************
+ =Our Projects
+***********************/
+
+.h2Sniffster {
+  font-size: 26px !important;
+  margin-top: 1px !important;
+}
+.h2Current {
+  margin-bottom: 10px !important;
+  margin-top: 5px !important;
+}
+.project-wrapper {
+  font-size: 1.1em;
+  line-height: 23px;
+}
+
+/**********************
+ =Dashboard
+***********************/
+
+.bodymed{
+  padding: 5px !important;
+  margin-bottom: 0px !important;
+}
 .panelDashboard {
   background-color: @color-primary;
   padding: 15px !important;
 }
 
-.wellDemocracy {
-  background-color: #e5f2fe;
+.wellDashboard {
+  background-color: #739EB0;
   padding: 15px !important;
 }
 
-.jumbotron {
-  background-color: #EBEBEB;
-  padding-left: 30px !important;
-  padding-right: 30px !important;
-  padding-top: 0px !important;
+.h3Dashboard {
+  color: @color-white;
+  margin-bottom: 0px !important;
+  margin-top: 5px !important;
 }
 
-.copyright {
-  margin-bottom: 15px !important;
+.myWeight {
+  color: @color-white;
+  font-size: 1.2em;
 }
 
-footer {
-  background-color: #3F3F3F;
-  color: white !important;
+/**********************
+ =Sidebar
+***********************/
+.sidebar-content {
+  padding-top: 30px;
+}
+.img-wrapper {
+  margin-bottom: 10px;
 }
 
-hr {
-  border-color: #78b4cc;
-  margin-bottom: 10px !important;
+/**********************
+ =Misc
+***********************/
+
+.font-white {
+  color: @color-white;
+}
+.text-gray {
+  color: @color-gray-mid;
+}
+
+.text-dark {
+  color: #494949;
+  text-decoration: underline;
+}
+
+.text-header {
+  font-size: 1.1em;
+}
+
+.itemNew {
+  color: @color-warning;
+}
+
+.bs-example-tabs {
+  min-height: 198px;
+}
+
+.modal-sm {
+  width: 300px !important;
+}
+.ulM {
+  margin-bottom: 30px !important;
   margin-top: 10px !important;
 }
-.myWidth {
-  width: 300px;
+
+.webEssentials {
+  color: @color-warning;
+  font-weight: 500 !important;
+  font-size: 13px;
 }
 
-h1 {
-  font-size: 44px !important;
+.visualStudio {
+  color: #4d6a83;
+  padding-top: 5px;
+  padding-bottom: 4px;
+  background-color: #FAFAFA !important;
 }
 
-#top-bar {
-  overflow: auto;
-}
-
-#top-sign {
-  float: left;
-  width: 90%;
-}
-
-#stick-contr {
-  padding-top: 13px;
-}
-
-
-
-div.menu {
-  border: 1px solid black;
-  display: none;
-  margin: 0px;
-  width: 80px;
-}
-
-div.passLayer {
-  background: none;
-  background-image: url(err);
-  border: 1px solid black;
-  color: #000000;
-  display: none;
-  font-family: verdana, arial, helvetica, sans-serif;
-  font-size: 14px;
-}
-
-div.menu_child {
-  border: none;
-  display: none;
-  margin: 0px;
-  padding: 0px 0px;
-  position: absolute;
-}
-
-a.menu_Item {
-  background: #FBFBFB;
-  border: 1px solid black;
-  border-bottom: none;
-  color: #6C6C6C;
-  display: block;
-  font-family: verdana, arial, helvetica, sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  margin: 0px;
-  padding: 2px 6px;
-  text-decoration: none;
-  width: 85px;
-}
-
-a.menu_Item_wide {
-  background: #FBFBFB;
-  border: 1px solid black;
-  border-bottom: none;
-  color: #6C6C6C;
-  display: block;
-  font-family: verdana, arial, helvetica, sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  margin: 0px;
-  padding: 2px 6px;
-  text-decoration: none;
-  width: 100%;
-}

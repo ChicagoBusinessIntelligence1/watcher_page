@@ -1,3 +1,4 @@
+@import "myconstants.css";
 /**********************
 IMPORTS
 ***********************/
@@ -18,15 +19,8 @@ IMPORTS
 .navStickk {
   text-shadow: #96cee6 0px 1px 0px;
 }
-.mc {
-  padding-left: 15px;
-}
-.h2-mc {
-  color: whitesmoke;
-  margin-top: 10px;
-}
 .navbar-mc {
-  background-color: #6393a7 !important;
+  background-color: rgba(150, 222, 253, 0.17) !important;
 }
 .navbar-right {
   color: #f0f6fa !important;
@@ -37,17 +31,20 @@ IMPORTS
   background-color: #2c5261 !important;
   border-color: #2c5261 !important;
 }
-/**********************
- Colors
-***********************/
-body {
-  color: #555555 !important;
-  background-color: #ffffff;
-  font-family: "Open Sans", "Helvetica Neue" 'Helvetica​' 'Arial' sans-serif;
-  line-height: 24px !important;
+.mc {
+  padding-left: 15px;
 }
-.fa-blue {
-  color: #6393a7;
+.h1-mc {
+  color: #555555;
+  margin-top: 10px;
+}
+.font-contract {
+  color: #fdfdfd !important;
+}
+.contract {
+  font-family: "Josefin Sans" !important;
+  font-size: 16px;
+  padding: 7px !important;
 }
 .my-repeat-animation.ng-enter,
 .my-repeat-animation.ng-leave,
@@ -103,16 +100,6 @@ must be set to 0 to avoid an accidental CSS inheritance */
 .sample-show-hide.ng-hide-remove.ng-hide-remove-active {
   opacity: 1;
 }
-.font-contract {
-  color: #ffffff !important;
-}
-.jumboHead {
-  background-color: #f0f6fa !important;
-  padding-right: 15px;
-  padding-left: 15px;
-  padding-top: 5px;
-  padding-bottom: 10px;
-}
 .btn-primary {
   padding-right: 5px;
   padding-left: 5px;
@@ -130,147 +117,31 @@ must be set to 0 to avoid an accidental CSS inheritance */
   background-color: #cc7763;
   border-color: #cc7763;
 }
-/*.btn-link{
-  color: #2C5261;
-  font-size: 13px;
-}*/
-.pTut {
-  margin-bottom: 0px;
-}
-.contract {
-  font-family: "Josefin Sans" !important;
-  font-size: 16px;
-  padding: 7px !important;
-}
-.main-content-wrapper {
-  font-size: 1.1em;
-  color: #555555;
-  line-height: 20px;
-}
-.content-wrapper {
-  background-color: #f6f9fb;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  padding-right: 30px;
-  padding-left: 30px;
-}
-.project-wrapper {
-  font-size: 1.2em;
-  line-height: 23px;
-}
-.sidebar-content {
-  padding-top: 30px;
-  background-color: #F6F9FB;
-  padding-left: 15px;
-  padding-right: 10px;
-}
-.aWatchers {
-  font-size: 1.2em;
-}
-.camImg {
-  /*
-  width: 2089px;
-  height: 1563px;
-  */
-}
-th {
-  font-size: 1.1em;
-}
-.video-wrapper {
-  margin: 0 auto 0 auto;
-}
-.text-header {
-  font-size: 1.1em;
-}
-.bs-example-tabs {
-  min-height: 198px !important;
-}
-.modal-sm {
-  width: 300px !important;
-}
-.table > tbody > tr > td {
-  line-height: 24px !important;
-}
-li.list-group-item.active:focus {
-  background-color: #6393a7 !important;
-  border-color: #6393a7 !important;
-}
-li.list-group-item.active {
-  background-color: #6393a7 !important;
-  border-color: #6393a7 !important;
-  border-top-left-radius: 1px;
-  border-top-right-radius: 1px;
-}
-.list-group-item:first-child {
-  border-top-left-radius: 1px;
-  border-top-right-radius: 1px;
-}
-li.list-group-item.active a:focus {
-  color: white;
-}
-a:hover {
-  color: #6393a7 !important;
-}
-li.list-group-item.active a {
-  color: white;
-}
-.microsoftImgWrapper {
-  margin-top: 20px;
-  margin-bottom: 20px !important;
-}
-.scrumHeaderFont {
-  font-size: 1.2em;
-  line-height: 26px !important;
-}
-.text-muted-scrum {
-  font-size: 1.2em;
-  color: #6393a7 !important;
-}
-.aTut {
-  font-size: .9em;
-  color: #cc7763;
-  text-decoration: underline;
-}
-.aShortcuts {
-  font-size: .9em;
-}
-.itemNew {
-  color: #cc7763;
-}
-.liShortcuts {
-  margin-bottom: 3px;
-}
-i {
-  margin-right: 3px;
-}
-a {
-  color: #739EB0;
-}
-a:focus {
-  color: #739EB0;
-}
-.aDefault {
-  color: #5c5c5c;
-}
 .btn-custom {
   margin-top: 5px;
 }
-.competition {
-  background-color: #FCF8F2;
+.label-new {
+  font-size: 9px !important;
 }
-.headComp {
-  color: #494949;
-  font-weight: 400;
+.label-processing {
+  font-size: 10px !important;
 }
-.textComp {
-  font-size: 22px;
+.label-warning {
+  background-color: #F2DEDE !important;
+  color: #cc7763;
+  padding: 3px !important;
+  font-style: italic;
 }
-.ulM {
-  margin-bottom: 30px !important;
-  margin-top: 10px !important;
+.label-success {
+  background-color: #DFF0D8 !important;
+  color: #3c763d !important;
+  padding: 3px !important;
+  font-style: italic;
+  font-size: 10px !important;
 }
-.dashWell {
-  padding-bottom: 5px !important;
+.panel {
+  border-radius: 1px;
+  background-color: #f0f6fa;
 }
 .panel-quiz-heading {
   background-color: #EBEBEB !important;
@@ -286,230 +157,52 @@ a:focus {
   margin-top: 10px !important;
   background-color: #F9F9F9;
 }
-.panel {
-  background-color: #F9F9F9;
-}
-.title-quiz {
-  color: #6393a7 !important;
-  padding-bottom: 5px;
-  margin-bottom: 5px;
-}
-.title-tut {
-  font-size: 20px !important;
-  padding-top: 10px;
-  color: #6393a7 !important;
-}
-.title-shortcuts {
-  font-size: 20px !important;
-  padding-top: 10px;
-  color: #6393a7 !important;
-  margin-bottom: 10px;
-}
-.aScrum {
-  font-size: 13px;
-}
-.tutDay {
-  font-size: 15px;
-}
-.th-quiz {
-  background-color: #F5F5F5 !important;
-}
-.th-q {
-  background-color: #FCFCFC !important;
-}
-.td-q {
-  padding-bottom: 15px !important;
-}
-.webEssentials {
-  color: #cc7763;
-  font-weight: 500 !important;
-  font-size: 13px;
-}
-.table-scrum {
-  margin-bottom: 0px !important;
-}
-.visualStudio {
-  color: #4d6a83;
-  padding-top: 5px;
-  padding-bottom: 4px;
-  background-color: #FAFAFA !important;
-}
-.ourWatchersPanel {
-  padding-top: 20px !important;
-  padding-bottom: 10px;
-  background-color: #6393a7;
-}
-li.list-group-item.active {
-  background-color: #6393a7;
-}
-.thumbnail-watchers {
-  margin-bottom: 1px;
-}
-.vs {
-  color: #68217A;
-}
-.bodymed {
-  padding: 5px !important;
-  margin-bottom: 0px !important;
-}
-.textWhite {
-  color: white !important;
-}
-.label-new {
-  font-size: 9px !important;
-}
-.tutDate {
-  color: #595959 !important;
-  margin-bottom: 1px !important;
-  font-size: 14px;
-  padding-bottom: 5px;
-  /*
-background-color: #56a3c8;
-*/
-}
-.ol-tuts {
-  padding-left: 25px !important;
-}
-.td-more {
-  padding-right: 10px !important;
-}
-.tabel-date {
-  margin-top: 10px !important;
-}
-.label-processing {
-  font-size: 10px !important;
-}
-.scrumVideos {
-  font-size: 12px !important;
-  color: #cc7763;
-  cursor: pointer !important;
-}
-.sprint {
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  color: #555555;
-}
-.sprint:hover {
-  text-decoration: underline !important;
-  color: #cc7763;
-}
-.text-gray {
-  color: #555555;
-}
-.h3Democracy {
-  margin-bottom: 5px;
-  margin-top: 5px;
-}
-.h3 {
-  font-size: 1.4em;
-  padding-top: 15px;
-}
-.img-wrapper {
-  margin-bottom: 10px;
-}
-.text-dark {
-  color: #494949;
-  text-decoration: underline;
-}
-.label-warning {
-  background-color: #F2DEDE !important;
-  color: #cc7763;
-  padding: 3px !important;
-  font-style: italic;
-}
-.label-success {
-  background-color: #DFF0D8 !important;
-  color: #3c763d !important;
-  padding: 3px !important;
-  font-style: italic;
-  font-size: 10px !important;
-}
-.font-white {
-  color: #ffffff;
-}
-.tbodyFont {
-  font-size: 13px !important;
-}
-.h2Sniffster {
-  font-size: 26px !important;
-  margin-top: 1px !important;
-}
-.h4Democracy {
-  font-size: 14px !important;
-  margin-bottom: 5px !important;
-  margin-top: 0px !important;
-}
-.alert-tutorial {
-  margin-top: 20px !important;
-  padding: 6px !important;
-}
-.h3Dashboard {
-  color: #ffffff;
-  margin-bottom: 0px !important;
-  margin-top: 5px !important;
-}
-.myWeight {
-  color: #ffffff;
-  font-size: 1.2em;
-}
-.h2Current {
-  margin-bottom: 10px !important;
-  margin-top: 5px !important;
-}
-.wellDashboard {
-  background-color: #739EB0;
-  padding: 15px !important;
-}
-.panel {
-  border-radius: 1px;
-}
-.moreModal:hover {
-  background-color: #EBEBEB !important;
-}
-.moreModal {
-  background-color: #f8f8f8 !important;
-}
-.panelDashboard {
-  background-color: #6393a7;
-  padding: 15px !important;
-}
-.wellDemocracy {
-  background-color: #e5f2fe;
-  padding: 15px !important;
-}
 .jumbotron {
   background-color: #EBEBEB;
   padding-left: 30px !important;
   padding-right: 30px !important;
   padding-top: 0px !important;
 }
-.copyright {
-  margin-bottom: 15px !important;
+li.list-group-item.active:focus {
+  background-color: #6393a7 !important;
+  border-color: #6393a7 !important;
 }
-footer {
-  background-color: #3F3F3F;
-  color: white !important;
+li.list-group-item.active {
+  background-color: #6393a7 !important;
+  border-color: #6393a7 !important;
+  border-top-left-radius: 1px;
+  border-top-right-radius: 1px;
+}
+li.list-group-item.active a:focus {
+  color: white;
+}
+li.list-group-item.active a {
+  color: white;
+}
+.list-group-item:first-child {
+  border-top-left-radius: 1px;
+  border-top-right-radius: 1px;
 }
 hr {
   border-color: #78b4cc;
   margin-bottom: 10px !important;
   margin-top: 10px !important;
 }
-.myWidth {
-  width: 300px;
+i {
+  margin-right: 3px;
 }
-h1 {
-  font-size: 44px !important;
+a {
+  color: #739EB0;
 }
-#top-bar {
-  overflow: auto;
+a:focus {
+  color: #739EB0;
 }
-#top-sign {
-  float: left;
-  width: 90%;
+a:hover {
+  color: #6393a7 !important;
 }
-#stick-contr {
-  padding-top: 13px;
+h3 {
+  font-size: 1.4em;
+  padding-top: 15px;
 }
 div.menu {
   border: 1px solid black;
@@ -560,4 +253,237 @@ a.menu_Item_wide {
   padding: 2px 6px;
   text-decoration: none;
   width: 100%;
+}
+/**********************
+ =Content
+***********************/
+body {
+  background-color: rgba(150, 222, 253, 0.05);
+  color: #555555 !important;
+  font-family: "Open Sans", "Helvetica Neue" 'Helvetica​' 'Arial' sans-serif;
+  line-height: 24px !important;
+}
+.content-wrapper {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-right: 30px;
+  padding-left: 30px;
+}
+.main-content-wrapper {
+  font-size: 1.1em;
+  color: #555555;
+  line-height: 20px;
+}
+/**********************
+ =Tutorials
+***********************/
+.aWebStorm {
+  font-size: 18px;
+  color: #555555;
+}
+.tutDate {
+  color: #595959 !important;
+  margin-bottom: 1px !important;
+  font-size: 14px;
+  padding-bottom: 5px;
+}
+.pTut {
+  margin-bottom: 0px;
+}
+.aTut {
+  font-size: .9em;
+  color: #cc7763;
+  text-decoration: underline;
+}
+.title-tut {
+  font-size: 20px !important;
+  padding-top: 10px;
+  color: #4d6a83 !important;
+}
+.tutFont {
+  line-height: 1.5em;
+}
+.tutDay {
+  font-size: lem;
+  font-weight: 500;
+}
+.alert-tutorial {
+  margin-top: 20px !important;
+  padding: 6px !important;
+}
+/**********************
+ =Shortcuts
+***********************/
+.aShortcuts {
+  font-size: .9em;
+}
+.liShortcuts {
+  margin-bottom: 3px;
+}
+.aDefault {
+  color: #5c5c5c;
+}
+.title-quiz {
+  color: #4d6a83 !important;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+}
+.title-shortcuts {
+  font-size: 20px !important;
+  padding-top: 10px;
+  color: #4d6a83 !important;
+  margin-bottom: 10px;
+}
+/**********************
+ =Camera
+***********************/
+.camImg {
+  border: 1px solid;
+}
+/**********************
+ =Watchers
+***********************/
+.thumbnail-watchers {
+  margin-bottom: 1px;
+}
+.ourWatchersPanel {
+  padding-top: 20px !important;
+  padding-bottom: 10px;
+  background-color: #6393a7;
+}
+.aWatchers {
+  font-size: 1.2em;
+}
+.ol-tuts {
+  padding-left: 25px !important;
+}
+/**********************
+ =Scrum
+***********************/
+.scrumHeaderFont {
+  font-size: 1.3em;
+  line-height: 1.9em;
+}
+.scrumVideos {
+  font-size: 12px !important;
+  color: #cc7763;
+  cursor: pointer !important;
+}
+.sprint {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #555555;
+}
+.text-muted-scrum {
+  font-size: 1.1em;
+  color: #6393a7 !important;
+}
+.sprint:hover {
+  text-decoration: underline !important;
+  color: #cc7763;
+}
+.aScrum {
+  font-size: .9em;
+  text-decoration: underline;
+}
+.moreModal:hover {
+  background-color: #EBEBEB !important;
+}
+.moreModal {
+  background-color: #f8f8f8 !important;
+}
+/**********************
+ =Our Projects
+***********************/
+.h2Sniffster {
+  font-size: 26px !important;
+  margin-top: 1px !important;
+}
+.h2Current {
+  margin-bottom: 10px !important;
+  margin-top: 5px !important;
+}
+.project-wrapper {
+  font-size: 1.1em;
+  line-height: 23px;
+}
+/**********************
+ =Dashboard
+***********************/
+.bodymed {
+  padding: 5px !important;
+  margin-bottom: 0px !important;
+}
+.panelDashboard {
+  background-color: #6393a7;
+  padding: 15px !important;
+}
+.wellDashboard {
+  background-color: #739EB0;
+  padding: 15px !important;
+}
+.h3Dashboard {
+  color: #fdfdfd;
+  margin-bottom: 0px !important;
+  margin-top: 5px !important;
+}
+.myWeight {
+  color: #fdfdfd;
+  font-size: 1.2em;
+}
+/**********************
+ =Sidebar
+***********************/
+.sidebar-content {
+  padding-top: 30px;
+}
+.img-wrapper {
+  margin-bottom: 10px;
+}
+/**********************
+ =Misc
+***********************/
+.font-white {
+  color: #fdfdfd;
+}
+.text-gray {
+  color: #555555;
+}
+.text-dark {
+  color: #494949;
+  text-decoration: underline;
+}
+.text-header {
+  font-size: 1.1em;
+}
+.itemNew {
+  color: #cc7763;
+}
+.bs-example-tabs {
+  min-height: 198px;
+}
+.modal-sm {
+  width: 300px !important;
+}
+.ulM {
+  margin-bottom: 30px !important;
+  margin-top: 10px !important;
+}
+.webEssentials {
+  color: #cc7763;
+  font-weight: 500 !important;
+  font-size: 13px;
+}
+.visualStudio {
+  color: #4d6a83;
+  padding-top: 5px;
+  padding-bottom: 4px;
+  background-color: #FAFAFA !important;
+}
+.copyright {
+  margin-bottom: 15px !important;
+}
+footer {
+  background-color: #3F3F3F;
+  color: white !important;
 }
