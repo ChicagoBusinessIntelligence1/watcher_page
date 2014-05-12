@@ -1,3 +1,4 @@
+@import "myconstants.css";
 hr {
   border-color: #78b4cc;
   margin-bottom: 10px !important;
@@ -68,6 +69,123 @@ a.menu_Item_wide {
   padding: 2px 6px;
   text-decoration: none;
   width: 100%;
+}
+.my-repeat-animation.ng-enter,
+.my-repeat-animation.ng-leave,
+.my-repeat-animation.ng-move {
+  -webkit-transition: 0.5s linear all;
+  transition: 0.5s linear all;
+  position: relative;
+}
+.my-repeat-animation.ng-enter {
+  left: -10px;
+  opacity: 0;
+}
+.my-repeat-animation.ng-enter-stagger {
+  /* this will have a 100ms delay between each successive leave animation */
+  -webkit-transition-delay: 0.2s;
+  transition-delay: 0.2s;
+  /* in case the stagger doesn't work then these two values
+must be set to 0 to avoid an accidental CSS inheritance */
+  -webkit-transition-duration: 0s;
+  transition-duration: 0s;
+}
+.my-repeat-animation.ng-enter.ng-enter-active {
+  left: 0;
+  opacity: 1;
+}
+.my-repeat-animation.ng-leave {
+  left: 0;
+  opacity: 1;
+}
+.my-repeat-animation.ng-leave.ng-leave-active {
+  left: -10px;
+  opacity: 0;
+}
+.my-repeat-animation.ng-move {
+  opacity: 0.5;
+}
+.my-repeat-animation.ng-move.ng-move-active {
+  opacity: 1;
+}
+.sample-show-hide.ng-hide-add,
+.sample-show-hide.ng-hide-remove {
+  -webkit-transition: all linear 2s;
+  -moz-transition: all linear 2s;
+  -o-transition: all linear 2s;
+  transition: all linear 2s;
+  display: block!important;
+}
+.sample-show-hide.ng-hide-add.ng-hide-add-active,
+.sample-show-hide.ng-hide-remove {
+  opacity: 0;
+}
+.sample-show-hide.ng-hide-add,
+.sample-show-hide.ng-hide-remove.ng-hide-remove-active {
+  opacity: 1;
+}
+li.list-group-item.active:focus {
+  background-color: #6393a7 !important;
+  border-color: #6393a7 !important;
+}
+li.list-group-item.active {
+  background-color: #6393a7 !important;
+  border-color: #6393a7 !important;
+  border-top-left-radius: 1px;
+  border-top-right-radius: 1px;
+}
+li.list-group-item.active a:focus {
+  color: white;
+}
+li.list-group-item.active a {
+  color: white;
+}
+.list-group-item:first-child {
+  border-top-left-radius: 1px;
+  border-top-right-radius: 1px;
+}
+.label-new {
+  font-size: 9px !important;
+}
+.label-processing {
+  font-size: 10px !important;
+}
+.label-warning {
+  background-color: #F2DEDE !important;
+  color: #cc7763;
+  padding: 3px !important;
+  font-style: italic;
+}
+.label-success {
+  background-color: #DFF0D8 !important;
+  color: #3c763d !important;
+  padding: 3px !important;
+  font-style: italic;
+  font-size: 10px !important;
+}
+.panel {
+  border-radius: 1px;
+  background-color: #f0f6fa;
+}
+.panel-quiz-heading {
+  background-color: #EBEBEB !important;
+  border-color: #d3d3d3 !important;
+}
+.panel-tut-heading {
+  background-color: #EBEBEB !important;
+  border-color: #d3d3d3!important;
+  padding-bottom: 7px !important;
+}
+.panel-quiz {
+  border-color: #d3d3d3 !important;
+  margin-top: 10px !important;
+  background-color: #F9F9F9;
+}
+.jumbotron {
+  background-color: #EBEBEB;
+  padding-left: 30px !important;
+  padding-right: 30px !important;
+  padding-top: 0px !important;
 }
 /**********************
  =Content
